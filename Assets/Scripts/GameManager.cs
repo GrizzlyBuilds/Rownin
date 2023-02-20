@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public TMPro.TextMeshProUGUI speedLabel;
     public TMPro.TextMeshProUGUI timeLabel;
     public TMPro.TextMeshProUGUI distanceLabel;
+    public TMPro.TextMeshProUGUI rotationsLabel;
     public GameObject finishPanel;
 
     public GameObject logos;
@@ -143,6 +144,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void UpdateRotations(int rotations)
+    {
+        var str = "";
+        for (int i = 0; i < rotations; i++)
+        {
+            str += "-";
+        }
+        rotationsLabel.text = str;
+    }
+
     public void UpdateSpeed(float speed)
     {
         speedLabel.text = speed.ToString();
@@ -188,7 +199,10 @@ public class GameManager : MonoBehaviour
         timeStart = Time.time;
         isGameStarted = true;
 
-        StartGhosts();
+        if (ProfileManager.instance.enableGhosts)
+        {
+            StartGhosts();
+        }
     }
 
     private void StartGhosts()

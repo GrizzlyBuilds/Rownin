@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
 
     private List<float> delays = new List<float>();
 
-    private float speed;
+    private float speed = 4;
 
     public void OnRotation()
     {
@@ -136,17 +136,23 @@ public class Player : MonoBehaviour
         // Calculate the speed of the boat based on time between rotations on average
         // This is not perfect or scientific in any way. Its mostly about feeling right
         // Adjust speedMultiplayer property on GameManager to fine tune
-        var average = delays.TakeLast(5).Average();
-        if (average == 0)
+        if (delays.Count() > 5)
         {
-            average = 1;
+            var average = delays.TakeLast(5).Average();
+            if (average == 0)
+            {
+                average = 1;
+            }
+            speed = average / GameManager.instance.speedMultiplayer;
         }
-        speed = average / GameManager.instance.speedMultiplayer;
+        else
+        {
+            Debug.LogWarning("No past inputs to average");
+        }
 
         if (isPlayer)
         {
             GameManager.instance.UpdateDistance(distance);
-            GameManager.instance.UpdateSpeed(speed);
         }
     }
 
@@ -180,13 +186,15 @@ public class Player : MonoBehaviour
         var ticks = DateTime.Now.Ticks;
         float delaySec = 0;
 
-        if (recordedInput.Count > 0)
+        if (lastRecordedTime > 0)
         {
             // Calculate the delay since the last input so we can replay it later accurately
             var span = new TimeSpan(ticks - lastRecordedTime);
             delaySec = (float)span.TotalSeconds;
         }
+
         lastRecordedTime = ticks;
+
         if (!skipRecord)
         {
             recordedInput.Add(new InputData() { Button = button, Delay = delaySec });
@@ -208,6 +216,11 @@ public class Player : MonoBehaviour
         }
 
         var isFirst = button == firstButton;
+
+        if (isFirst)
+        {
+            delays.Add(delaySec);
+        }
 
         if (lastButton == button)
         {
@@ -233,13 +246,17 @@ public class Player : MonoBehaviour
             rotations++;
             if (isFirst)
             {
-                delays.Add(delaySec);
                 OnRotation();
             }
         }
         else
         {
             rotations--;
+        }
+
+        if (isPlayer)
+        {
+            GameManager.instance.UpdateRotations(rotations);
         }
 
         rotationPercentage = rotationPercentageIncrement * (float)rotations;

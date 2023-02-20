@@ -21,6 +21,13 @@ public class ProfileManager : MonoBehaviour
         Debug.Log("Ghosts Enabled: " + enableGhosts);
     }
 
+    public void ResetProfiles()
+    {
+        Debug.LogWarning("Reset profiles");
+        profiles = new List<Profile>();
+        SaveProfiles();
+    }
+
     // Start is called before the first frame update
     void Start()
     {

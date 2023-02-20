@@ -15,6 +15,16 @@ public class SerialManager : MonoBehaviour
     private IEnumerator handshakeCoroutine;
     private const string ROWNIN_HANDSHAKE_RESPONSE = "Rownin";
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            isSetup = true;
+            Debug.Log("Manually skipping Arduino setup");
+            GameManager.instance.Ready();
+        }
+    }
+
     private IEnumerator SendHandshake(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
